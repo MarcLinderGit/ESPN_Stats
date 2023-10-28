@@ -74,15 +74,12 @@ class PlayerBioScraper:
                 self.all_player_info[player_name]['Draft_Team'] = 'undrafted'
             else:
                 draft_info_parts = [part.strip() if part.strip() else "undrafted" for part in re.split(':|, | \(', draft_info)]
-                print(draft_info_parts)
                 self.all_player_info[player_name]['Draft_Year'], self.all_player_info[player_name]['Draft_Round'], self.all_player_info[player_name]['Draft_Pick_Overall'], self.all_player_info[player_name]['Draft_Team'] = draft_info_parts
                 # self.all_player_info[player_name]['Draft_Year'] = self.all_player_info[player_name]['Draft_Year'].replace('Not Available', 'undrafted') 
                 self.all_player_info[player_name]['Draft_Round'] = self.all_player_info[player_name]['Draft_Round'].replace('Rd ', '') # Remove Rd 
                 self.all_player_info[player_name]['Draft_Pick_Overall'] = self.all_player_info[player_name]['Draft_Pick_Overall'].replace('Pk ', '') # Remove Pk
                 self.all_player_info[player_name]['Draft_Team'] = self.all_player_info[player_name]['Draft_Team'].replace(')', '') # Remove )
-                print("this is player info ", self.all_player_info[player_name])
             self.all_player_info[player_name].pop('Draft Info', None)
-        print("this is end of split_draft_info: ", self.all_player_info)
 
 
     def split_ht_wt(self):
@@ -107,14 +104,13 @@ class PlayerBioScraper:
 
     def transpose_df(self):
         all_player_info_df = pd.DataFrame(self.all_player_info).T
-        print("This is all_player_info", self.all_player_info)
-        print("this is the df", all_player_info_df)
         all_player_info_df.drop(columns=['HT/WT'], inplace=True)
         return all_player_info_df
 
-    def export_to_csv(self, file_name='player_bio.csv'):
+    def export_to_csv(self, file_name='player_bios.csv'):
         self.process_player_info()
         all_player_info_df = self.transpose_df()
+        all_player_info_df.set_index("Name", inplace=True)
         all_player_info_df.to_csv(file_name, index=True)
         self.csv_exported = True
 
@@ -122,6 +118,7 @@ class PlayerBioScraper:
         if not self.csv_exported:
             self.process_player_info()
         all_player_info_df = self.transpose_df()
+        all_player_info_df.set_index("Name", inplace=True)
         return all_player_info_df
 
 
